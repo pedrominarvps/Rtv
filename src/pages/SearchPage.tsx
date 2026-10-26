@@ -1,0 +1,180 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import type { MediaItem } from '../types';
+import { MediaCard } from '../components/MediaCard';
+import { ChannelCard } from '../components/ChannelCard';
+import { updatePageSeo } from '../utils/seo';
+import { Search, X, Loader2 } from 'lucide-react';
+
+interface SearchPageProps {
+  catalog: MediaItem[];
+  loading: boolean;
+  onPlay: (item: MediaItem, videoUrl?: string) => void;
+  onToggleWatchlist: (item: MediaItem) => void;
+  isInWatchlist: (id: string) => boolean;
+}
+
+const CATEGORIES = ['All', 'Live TV', 'Series', 'Movies', 'Sci-Fi', 'Drama', 'Comedy', 'Sports'];
+
+export const SearchPage: React.FC<SearchPageProps> = ({
+  catalog,
+  loading,
+  onPlay,
+  onToggleWatchlist,
+  isInWatchlist,
+}) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const queryParam = searchParams.get('q') || '';
+  const [query, setQuery] = useState(queryParam);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Sync state with URL params
+  useEffect(() => {
+    setQuery(queryParam);
+  }, [queryParam]);
+
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    if (val.trim()) {
+      setSearchParams({ q: val });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  // SEO Update
+  useEffect(() => {
+    updatePageSeo({
+      title: query ? `Search: "${query}"` : 'Search Movies, Series & Channels',
+      description: 'Search and stream thousands of movies, exclusive series, and 24/7 TV channels on RukaTV+.',
+      url: window.location.href,
+    });
+  }, [query]);
+
+  const filteredItems = useMemo(() => {
+    return catalog.filter((item) => {
+      // Category filter
+      if (selectedCategory !== 'All') {
+        if (selectedCategory === 'Live TV' && !item.isLiveChannel) return false;
+        if (selectedCategory === 'Series' && item.type !== 'series') return false;
+        if (selectedCategory === 'Movies' && item.type !== 'movie') return false;
+        if (selectedCategory === 'Sports' && item.type !== 'sports') return false;
+        if (['Sci-Fi', 'Drama', 'Comedy'].includes(selectedCategory)) {
+          if (!item.genre.some((g) => g.toLowerCase().includes(selectedCategory.toLowerCase()))) {
+            return false;
+          }
+        }
+      }
+
+      // Search query filter
+      if (!query.trim()) return true;
+      const q = query.toLowerCase();
+      const matchTitle = item.title.toLowerCase().includes(q);
+      const matchGenre = item.genre.some((g) => g.toLowerCase().includes(q));
+      const matchCast = item.cast.some((c) => c.toLowerCase().includes(q));
+      const matchSynopsis = item.synopsis.toLowerCase().includes(q);
+
+      return matchTitle || matchGenre || matchCast || matchSynopsis;
+    });
+  }, [catalog, query, selectedCategory]);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 select-none animate-fadeIn space-y-8">
+      {/* Search Header */}
+      <div>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Search
+        </h1>
+        <p className="text-sm text-white/60 mt-1">
+          Explore movies, series, actors, and 24/7 live television channels.
+        </p>
+      </div>
+
+      {/* Main Search Input */}
+      <div className="relative max-w-3xl">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleQueryChange(e.target.value)}
+          placeholder="Search movies, series, actors, or genres..."
+          autoFocus
+          className="w-full bg-white/10 text-white placeholder-white/40 pl-12 pr-10 py-4 rounded-2xl text-base font-medium border border-white/10 focus:outline-none focus:border-white/30 focus:bg-white/15 transition-all shadow-xl"
+        />
+        {query && (
+          <button
+            onClick={() => handleQueryChange('')}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+            aria-label="Clear search"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
+      {/* Category Filter Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+        {CATEGORIES.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              selectedCategory === category
+                ? 'bg-white text-black shadow-md'
+                : 'glass-pill text-white/70 hover:text-white'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      {/* Results Header Counter */}
+      <div className="flex items-center justify-between text-xs text-white/50 font-medium border-b border-white/10 pb-3">
+        <span>Found {filteredItems.length} titles</span>
+        {query && <span>Showing results for "{query}"</span>}
+      </div>
+
+      {/* Results Grid */}
+      {loading ? (
+        <div className="py-24 flex items-center justify-center gap-3 text-white/60">
+          <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+          <span>Searching catalog...</span>
+        </div>
+      ) : filteredItems.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          {filteredItems.map((item) =>
+            item.isLiveChannel ? (
+              <ChannelCard
+                key={item.id}
+                item={item}
+                onPlay={onPlay}
+                onToggleWatchlist={onToggleWatchlist}
+                isInWatchlist={isInWatchlist(item.id)}
+              />
+            ) : (
+              <MediaCard
+                key={item.id}
+                item={item}
+                aspect="poster"
+                onPlay={onPlay}
+                onOpenDetails={(target) => navigate(`/title/${target.id}`)}
+                onToggleWatchlist={onToggleWatchlist}
+                isInWatchlist={isInWatchlist(item.id)}
+              />
+            )
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-24 space-y-3">
+          <p className="text-lg font-semibold text-white/80">No results found</p>
+          <p className="text-sm text-white/50 max-w-sm mx-auto">
+            Check your spelling or try exploring another category such as Sci-Fi, Drama, or TV Season.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rukatv.vercel.app/sitemap.xml
