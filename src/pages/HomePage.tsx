@@ -6,6 +6,7 @@ import { FlowcaseHero } from '../components/FlowcaseHero';
 import { ShelfRail } from '../components/ShelfRail';
 import { CatalogSkeleton } from '../components/CatalogSkeleton';
 import { updatePageSeo } from '../utils/seo';
+import { useTranslation } from '../context/LanguageContext';
 import { AlertCircle } from 'lucide-react';
 
 interface HomePageProps {
@@ -30,6 +31,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onRetry,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     updatePageSeo({
@@ -49,15 +51,15 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className="p-4 rounded-2xl bg-red-950/40 border border-red-500/20 text-red-400 shadow-2xl">
           <AlertCircle className="w-8 h-8" />
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-white">No se pudo cargar el catálogo</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-white">{t('error.title')}</h2>
         <p className="text-sm text-white/60 max-w-md">
-          {errorMessage || 'Verifica la conexión con el servidor Xtream Code en .env o el estado de tu red.'}
+          {errorMessage || t('error.desc')}
         </p>
         <button
           onClick={onRetry}
           className="px-6 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 active:scale-95 transition-all shadow-md"
         >
-          Reintentar conexión
+          {t('error.retry')}
         </button>
       </div>
     );
@@ -79,8 +81,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* In Progress / Continue Watching (if user has active queue) */}
       {watchlistItems.length > 0 && (
         <ShelfRail
-          title="Up Next"
-          subtitle="Pick up right where you left off"
+          title={t('shelf.upNextTitle')}
+          subtitle={t('shelf.upNextSubtitle')}
           items={watchlistItems}
           aspect="landscape"
           onPlay={onPlay}
@@ -93,8 +95,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Top 10 on RukaTV with custom rankings */}
       {catalog.topTen.length > 0 && (
         <ShelfRail
-          title="Top 10 on RukaTV"
-          subtitle="The most-watched series and movies this week"
+          title={t('shelf.topTenTitle')}
+          subtitle={t('shelf.topTenSubtitle')}
           items={catalog.topTen}
           aspect="poster"
           showRank={true}
@@ -108,8 +110,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Movies Shelf */}
       {catalog.movies.length > 0 && (
         <ShelfRail
-          title="Blockbuster Movies"
-          subtitle="Stream hit feature films in 4K UHD and Dolby Atmos"
+          title={t('shelf.moviesTitle')}
+          subtitle={t('shelf.moviesSubtitle')}
           items={catalog.movies}
           aspect="poster"
           onPlay={onPlay}
@@ -122,8 +124,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Series Shelf */}
       {catalog.series.length > 0 && (
         <ShelfRail
-          title="Top Series & Dramas"
-          subtitle="Binge full seasons and exclusive episodes"
+          title={t('shelf.seriesTitle')}
+          subtitle={t('shelf.seriesSubtitle')}
           items={catalog.series}
           aspect="landscape"
           onPlay={onPlay}
@@ -136,8 +138,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Live TV Channels Shelf */}
       {catalog.liveChannels.length > 0 && (
         <ShelfRail
-          title="Live TV Channels"
-          subtitle="24/7 sports, news, and live broadcasts"
+          title={t('shelf.liveChannelsTitle')}
+          subtitle={t('shelf.liveChannelsSubtitle')}
           items={catalog.liveChannels}
           aspect="landscape"
           isChannelRail={true}
@@ -151,8 +153,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Additional Curated Feature Films */}
       {catalog.movies.length > 15 && (
         <ShelfRail
-          title="Featured Cinema & Action"
-          subtitle="Critically acclaimed movies streaming in 4K"
+          title={t('shelf.featuredCinemaTitle')}
+          subtitle={t('shelf.featuredCinemaSubtitle')}
           items={catalog.movies.slice(15, 30)}
           aspect="landscape"
           onPlay={onPlay}

@@ -5,6 +5,7 @@ import { fetchSeriesDetails } from '../services/xtreamService';
 import { updatePageSeo } from '../utils/seo';
 import { RatingBadges } from '../components/RatingBadges';
 import { ShelfRail } from '../components/ShelfRail';
+import { useTranslation } from '../context/LanguageContext';
 import { Play, Plus, Check, Share2, Film, ChevronLeft, Loader2 } from 'lucide-react';
 
 interface DetailPageProps {
@@ -24,6 +25,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
 }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [item, setItem] = useState<MediaItem | null>(null);
   const [activeSeason, setActiveSeason] = useState(1);
@@ -109,7 +111,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-4 pt-24 text-white/60">
         <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-        <p className="text-sm">Cargando detalles de RukaTV+...</p>
+        <p className="text-sm">{t('detail.loading')}</p>
       </div>
     );
   }
@@ -117,15 +119,15 @@ export const DetailPage: React.FC<DetailPageProps> = ({
   if (!item) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-32 text-center space-y-4 select-none">
-        <h1 className="text-2xl font-bold text-white">Título no encontrado</h1>
+        <h1 className="text-2xl font-bold text-white">{t('detail.notFoundTitle')}</h1>
         <p className="text-sm text-white/60">
-          El contenido que buscas no está disponible en el catálogo actual.
+          {t('detail.notFoundDesc')}
         </p>
         <button
           onClick={() => navigate('/')}
           className="px-6 py-2.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-white/90 transition-all"
         >
-          Volver a Inicio
+          {t('detail.backHome')}
         </button>
       </div>
     );
@@ -165,44 +167,49 @@ export const DetailPage: React.FC<DetailPageProps> = ({
   };
 
   return (
-    <article className="pt-20 pb-20 select-none animate-fadeIn space-y-12">
+    <article className="pb-20 select-none animate-fadeIn space-y-10">
       {/* Full-Bleed Cinematic Hero Banner */}
-      <section className="relative w-full h-[62vh] min-h-[460px] max-h-[700px] overflow-hidden">
+      <section className="relative w-full min-h-[580px] lg:h-[72vh] overflow-hidden">
+        {/* Background Image absolutely positioned */}
         <img
-          src={item.backdropUrl}
+          src={item.backdropUrl || item.posterUrl}
           alt={item.title}
-          className="w-full h-full object-cover object-center filter brightness-95"
+          className="absolute inset-0 w-full h-full object-cover object-center filter brightness-90"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-transparent w-full md:w-3/4" />
+
+        {/* Cinematic Vignette Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent w-full md:w-3/4" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent" />
 
         {/* Back navigation pill */}
-        <div className="absolute top-6 left-4 sm:left-8 z-30">
+        <div className="absolute top-24 left-4 sm:left-8 z-30">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white/80 hover:text-white border border-white/10 hover:bg-black/80 transition-all text-xs font-semibold shadow-lg"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md text-white/90 hover:text-white border border-white/15 hover:bg-black/80 hover:scale-105 active:scale-95 transition-all text-xs font-semibold shadow-2xl"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Volver</span>
+            <span>{t('detail.back')}</span>
           </button>
         </div>
 
         {/* Hero Content */}
-        <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12 z-20">
+        <div className="relative max-w-7xl mx-auto h-full min-h-[580px] lg:min-h-[72vh] px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12 z-20">
           <div className="max-w-2xl space-y-4">
             {item.isAppleOriginal && (
               <div className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase text-purple-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                <span>Ruka Original</span>
+                <span>{t('hero.original')}</span>
               </div>
             )}
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white drop-shadow-md">
+            {/* Prominent Title */}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
               {item.title}
             </h1>
 
             {/* Badges Strip */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <RatingBadges
                 rating={item.rating}
                 rottenTomatoes={item.rottenTomatoes}
@@ -217,23 +224,25 @@ export const DetailPage: React.FC<DetailPageProps> = ({
             </div>
 
             {/* Synopsis */}
-            <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl line-clamp-3">
+            <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl line-clamp-3 drop-shadow">
               {item.synopsis}
             </p>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Primary Play Button */}
               <button
                 onClick={handleStreamClick}
-                className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 active:scale-95 transition-all shadow-lg"
+                className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white text-black font-bold text-sm hover:bg-white/90 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/10"
               >
-                <Play className="w-4 h-4 fill-black text-black ml-0.5" />
-                <span>Stream Now</span>
+                <Play className="w-5 h-5 fill-black text-black ml-0.5" />
+                <span>{t('detail.streamNow')}</span>
               </button>
 
+              {/* Watchlist Toggle Button */}
               <button
                 onClick={() => onToggleWatchlist(item)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-semibold transition-all ${
+                className={`flex items-center gap-2 px-5 py-3.5 rounded-full text-xs font-semibold transition-all ${
                   inWatchlist
                     ? 'bg-white/30 text-white border border-white/40'
                     : 'glass-pill text-white hover:bg-white/20'
@@ -241,27 +250,65 @@ export const DetailPage: React.FC<DetailPageProps> = ({
               >
                 {inWatchlist ? (
                   <>
-                    <Check className="w-4 h-4" />
-                    <span>In Up Next</span>
+                    <Check className="w-4 h-4 text-white" />
+                    <span>{t('detail.inUpNext')}</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4" />
-                    <span>Add to Up Next</span>
+                    <Plus className="w-4 h-4 text-white" />
+                    <span>{t('detail.addToUpNext')}</span>
                   </>
                 )}
               </button>
 
+              {/* Share Button */}
               <button
                 onClick={handleShare}
-                className="p-3 rounded-full glass-pill text-white/80 hover:text-white transition-all text-xs flex items-center gap-1.5"
-                title="Share link"
-                aria-label="Share title"
+                className="p-3.5 rounded-full glass-pill text-white/80 hover:text-white transition-all text-xs flex items-center gap-1.5"
+                title={t('detail.share')}
+                aria-label={t('detail.share')}
               >
                 <Share2 className="w-4 h-4" />
-                {copiedShare && <span className="text-[10px] pr-1">Link Copied</span>}
+                {copiedShare && <span className="text-[10px] pr-1">{t('detail.linkCopied')}</span>}
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Prominent Sticky Quick Play Bar */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/80 border border-white/10 backdrop-blur-md shadow-2xl">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleStreamClick}
+              className="flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm hover:bg-white/90 active:scale-95 transition-all shadow-lg"
+            >
+              <Play className="w-4 h-4 fill-black text-black ml-0.5" />
+              <span>{t('detail.play')}</span>
+            </button>
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-bold text-white truncate">
+                {item.title}
+              </h2>
+              <p className="text-xs text-white/50 truncate">
+                {item.year} · {item.durationOrSeasons} · {item.genre.join(', ')}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onToggleWatchlist(item)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+                inWatchlist
+                  ? 'bg-white/30 text-white border border-white/40'
+                  : 'glass-pill text-white hover:bg-white/20'
+              }`}
+            >
+              {inWatchlist ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              <span>{inWatchlist ? t('detail.inUpNext') : t('detail.addToUpNext')}</span>
+            </button>
           </div>
         </div>
       </section>
@@ -272,7 +319,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-white/10">
           <div className="md:col-span-2 space-y-4">
             <h2 className="text-base font-bold tracking-wide text-white uppercase text-xs text-white/50">
-              Overview
+              {t('detail.overview')}
             </h2>
             <p className="text-base text-white/90 leading-relaxed">
               {item.longDescription || item.synopsis}
@@ -282,7 +329,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
           <div className="space-y-4 text-xs text-white/70 bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg">
             <div>
               <span className="block text-white/40 font-semibold mb-1 uppercase tracking-wider text-[10px]">
-                Starring
+                {t('detail.starring')}
               </span>
               <p className="text-white/90 font-medium text-sm">
                 {item.cast.join(', ')}
@@ -291,7 +338,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
 
             <div>
               <span className="block text-white/40 font-semibold mb-1 uppercase tracking-wider text-[10px]">
-                Direction & Studio
+                {t('detail.direction')}
               </span>
               <p className="text-white/90 font-medium text-sm">
                 {item.creatorsOrDirectors.join(', ')}
@@ -300,7 +347,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
 
             <div>
               <span className="block text-white/40 font-semibold mb-1 uppercase tracking-wider text-[10px]">
-                Audio & Video Capabilities
+                {t('detail.capabilities')}
               </span>
               <p className="text-white/90 font-medium text-sm">
                 {item.audioBadges.join(' · ')}
@@ -315,7 +362,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <h2 className="text-xl font-bold text-white flex items-center gap-2.5">
                 <Film className="w-5 h-5 text-purple-400" />
-                <span>Episodes</span>
+                <span>{t('detail.episodes')}</span>
               </h2>
 
               {seasons.length > 1 && (
@@ -330,7 +377,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
                           : 'glass-pill text-white/70 hover:text-white'
                       }`}
                     >
-                      Season {seasonNum}
+                      {t('detail.season')} {seasonNum}
                     </button>
                   ))}
                 </div>
@@ -340,7 +387,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
             {loadingEpisodes ? (
               <div className="flex items-center justify-center py-16 gap-3 text-white/60 text-sm">
                 <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
-                <span>Loading episodes from server...</span>
+                <span>{t('detail.loadingEpisodes')}</span>
               </div>
             ) : currentSeasonEpisodes.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -370,7 +417,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
                     <div className="p-4 flex-1 flex flex-col justify-between">
                       <div>
                         <div className="text-[11px] font-semibold text-white/50 mb-1">
-                          Episode {ep.episodeNumber}
+                          {t('detail.episode')} {ep.episodeNumber}
                         </div>
                         <h3 className="text-sm font-semibold text-white line-clamp-1 group-hover:text-purple-300 transition-colors">
                           {ep.title}
@@ -385,7 +432,7 @@ export const DetailPage: React.FC<DetailPageProps> = ({
               </div>
             ) : (
               <div className="py-12 text-center text-xs text-white/50">
-                Select "Stream Now" above to start playback.
+                Selecciona "{t('detail.streamNow')}" arriba para iniciar la reproducción.
               </div>
             )}
           </section>
@@ -395,8 +442,8 @@ export const DetailPage: React.FC<DetailPageProps> = ({
         {relatedItems.length > 0 && (
           <section className="pt-6">
             <ShelfRail
-              title="More to Watch"
-              subtitle={`Similar ${item.type === 'series' ? 'series' : 'movies'} you might enjoy`}
+              title={t('detail.moreToWatch')}
+              subtitle={t('detail.similar')}
               items={relatedItems}
               aspect={item.type === 'series' ? 'landscape' : 'poster'}
               onPlay={onPlay}

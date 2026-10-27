@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { RukaTvLogo } from '../components/RukaTvLogo';
 import { updatePageSeo } from '../utils/seo';
+import { useTranslation } from '../context/LanguageContext';
 import { ShieldCheck, FileText, CreditCard, Scale, HelpCircle, ChevronLeft } from 'lucide-react';
 
 export type LegalTab = 'privacy' | 'terms' | 'sales' | 'legal' | 'support';
@@ -9,25 +10,26 @@ export type LegalTab = 'privacy' | 'terms' | 'sales' | 'legal' | 'support';
 export const LegalPage: React.FC = () => {
   const { tab = 'privacy' } = useParams<{ tab: LegalTab }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const activeTab: LegalTab = ['privacy', 'terms', 'sales', 'legal', 'support'].includes(tab)
     ? tab
     : 'privacy';
 
   const tabs: { id: LegalTab; label: string; icon: React.FC<{ className?: string }> }[] = [
-    { id: 'privacy', label: 'Privacy Policy', icon: ShieldCheck },
-    { id: 'terms', label: 'Terms of Use', icon: FileText },
-    { id: 'sales', label: 'Sales Policy', icon: CreditCard },
-    { id: 'legal', label: 'Legal', icon: Scale },
-    { id: 'support', label: 'Support', icon: HelpCircle },
+    { id: 'privacy', label: t('footer.privacy'), icon: ShieldCheck },
+    { id: 'terms', label: t('footer.terms'), icon: FileText },
+    { id: 'sales', label: t('footer.sales'), icon: CreditCard },
+    { id: 'legal', label: t('footer.legal'), icon: Scale },
+    { id: 'support', label: t('footer.support'), icon: HelpCircle },
   ];
 
   const titles: Record<LegalTab, string> = {
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Use',
-    sales: 'Sales Policy',
-    legal: 'Legal & Trademarks',
-    support: 'Support Center',
+    privacy: t('footer.privacy'),
+    terms: t('footer.terms'),
+    sales: t('footer.sales'),
+    legal: t('footer.legal'),
+    support: t('footer.support'),
   };
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export const LegalPage: React.FC = () => {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-white/80 hover:text-white transition-all shadow-md"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Volver a Inicio</span>
+          <span>{t('detail.backHome')}</span>
         </button>
       </div>
 

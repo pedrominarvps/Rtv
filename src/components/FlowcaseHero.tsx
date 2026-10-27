@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import type { MediaItem } from '../types';
 import { RatingBadges } from './RatingBadges';
+import { useTranslation } from '../context/LanguageContext';
 import { Play, Plus, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FlowcaseHeroProps {
@@ -19,6 +20,7 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
   onToggleWatchlist,
   isInWatchlist
 }) => {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<number | null>(null);
@@ -84,7 +86,7 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
           {activeItem.isAppleOriginal && (
             <div className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase text-white/90">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-              <span>Ruka Original</span>
+              <span>{t('hero.original')}</span>
             </div>
           )}
 
@@ -131,7 +133,7 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
               className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 active:scale-95 transition-all shadow-lg shadow-white/10"
             >
               <Play className="w-4 h-4 fill-black text-black" />
-              <span>Stream Now</span>
+              <span>{t('hero.streamNow')}</span>
             </button>
 
             {/* Secondary: Add to Up Next */}
@@ -146,12 +148,12 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
               {inWatchlist ? (
                 <>
                   <Check className="w-4 h-4 text-white" />
-                  <span>In Up Next</span>
+                  <span>{t('hero.inUpNext')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4 text-white" />
-                  <span>Add to Up Next</span>
+                  <span>{t('hero.addToUpNext')}</span>
                 </>
               )}
             </button>
@@ -164,7 +166,7 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
                 onOpenDetails(activeItem);
               }}
               className="p-3 rounded-full glass-pill text-white hover:text-white transition-all inline-flex items-center justify-center"
-              aria-label="More Information and Episodes"
+              aria-label={t('hero.moreInfo')}
             >
               <Info className="w-4 h-4" />
             </Link>

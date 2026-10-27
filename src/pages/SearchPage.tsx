@@ -4,6 +4,7 @@ import type { MediaItem } from '../types';
 import { MediaCard } from '../components/MediaCard';
 import { ChannelCard } from '../components/ChannelCard';
 import { updatePageSeo } from '../utils/seo';
+import { useTranslation } from '../context/LanguageContext';
 import { Search, X, Loader2 } from 'lucide-react';
 
 interface SearchPageProps {
@@ -14,8 +15,6 @@ interface SearchPageProps {
   isInWatchlist: (id: string) => boolean;
 }
 
-const CATEGORIES = ['All', 'Live TV', 'Series', 'Movies', 'Sci-Fi', 'Drama', 'Comedy', 'Sports'];
-
 export const SearchPage: React.FC<SearchPageProps> = ({
   catalog,
   loading,
@@ -25,10 +24,22 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const queryParam = searchParams.get('q') || '';
   const [query, setQuery] = useState(queryParam);
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const categories = [
+    { id: 'All', label: t('tv.all') },
+    { id: 'Live TV', label: t('tv.header') },
+    { id: 'Series', label: 'Series' },
+    { id: 'Movies', label: t('tv.movies') },
+    { id: 'Sports', label: t('tv.sports') },
+    { id: 'Drama', label: 'Drama' },
+    { id: 'Comedy', label: 'Comedy' },
+    { id: 'Sci-Fi', label: 'Sci-Fi' },
+  ];
 
   // Sync state with URL params
   useEffect(() => {
@@ -47,11 +58,11 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   // SEO Update
   useEffect(() => {
     updatePageSeo({
-      title: query ? `Search: "${query}"` : 'Search Movies, Series & Channels',
+      title: query ? `${t('search.title')}: "${query}"` : t('search.title'),
       description: 'Search and stream thousands of movies, exclusive series, and 24/7 TV channels on RukaTV+.',
       url: window.location.href,
     });
-  }, [query]);
+  }, [query, t]);
 
   const filteredItems = useMemo(() => {
     return catalog.filter((item) => {
@@ -85,10 +96,10 @@ export const SearchPage: React.FC<SearchPageProps> = ({
       {/* Search Header */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Search
+          {t('search.title')}
         </h1>
         <p className="text-sm text-white/60 mt-1">
-          Explore movies, series, actors, and 24/7 live television channels.
+          {t('search.subtitle')}
         </p>
       </div>
 
@@ -99,7 +110,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
           type="text"
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
-          placeholder="Search movies, series, actors, or genres..."
+          placeholder={t('search.placeholder')}
           autoFocus
           className="w-full bg-white/10 text-white placeholder-white/40 pl-12 pr-10 py-4 rounded-2xl text-base font-medium border border-white/10 focus:outline-none focus:border-white/30 focus:bg-white/15 transition-all shadow-xl"
         />
@@ -107,7 +118,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
           <button
             onClick={() => handleQueryChange('')}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
-            aria-label="Clear search"
+            aria-label="Clear"
           >
             <X className="w-5 h-5" />
           </button>
@@ -116,32 +127,32 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
       {/* Category Filter Pills */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-        {CATEGORIES.map((category) => (
+        {categories.map((category) => (
           <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
             className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-              selectedCategory === category
+              selectedCategory === category.id
                 ? 'bg-white text-black shadow-md'
                 : 'glass-pill text-white/70 hover:text-white'
             }`}
           >
-            {category}
+            {category.label}
           </button>
         ))}
       </div>
 
       {/* Results Header Counter */}
       <div className="flex items-center justify-between text-xs text-white/50 font-medium border-b border-white/10 pb-3">
-        <span>Found {filteredItems.length} titles</span>
-        {query && <span>Showing results for "{query}"</span>}
+        <span>{filteredItems.length} {t('search.found')}</span>
+        {query && <span>{t('search.showing')} "{query}"</span>}
       </div>
 
       {/* Results Grid */}
       {loading ? (
         <div className="py-24 flex items-center justify-center gap-3 text-white/60">
           <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-          <span>Searching catalog...</span>
+          <span>{t('search.loading')}</span>
         </div>
       ) : filteredItems.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
@@ -169,9 +180,9 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         </div>
       ) : (
         <div className="text-center py-24 space-y-3">
-          <p className="text-lg font-semibold text-white/80">No results found</p>
+          <p className="text-lg font-semibold text-white/80">{t('search.noResultsTitle')}</p>
           <p className="text-sm text-white/50 max-w-sm mx-auto">
-            Check your spelling or try exploring another category such as Sci-Fi, Drama, or TV Season.
+            {t('search.noResultsDesc')}
           </p>
         </div>
       )}

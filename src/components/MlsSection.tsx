@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import type { MediaItem } from '../types';
 import { ChannelCard } from './ChannelCard';
+import { useTranslation } from '../context/LanguageContext';
 import { Play, Trophy, Calendar, Radio } from 'lucide-react';
 
 interface MlsSectionProps {
@@ -17,6 +18,7 @@ export const MlsSection: React.FC<MlsSectionProps> = ({
   onToggleWatchlist,
   isInWatchlist
 }) => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const categories = useMemo(() => {
@@ -40,8 +42,8 @@ export const MlsSection: React.FC<MlsSectionProps> = ({
   if (mlsItems.length === 0) {
     return (
       <div className="pt-32 pb-24 text-center select-none space-y-3">
-        <p className="text-lg font-semibold text-white/80">No hay canales de televisión disponibles</p>
-        <p className="text-sm text-white/50">Verifica la conexión con el servidor Xtream Code.</p>
+        <p className="text-lg font-semibold text-white/80">{t('tv.emptyTitle')}</p>
+        <p className="text-sm text-white/50">{t('tv.emptyDesc')}</p>
       </div>
     );
   }
@@ -59,7 +61,7 @@ export const MlsSection: React.FC<MlsSectionProps> = ({
             <div className="max-w-xl space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/80 backdrop-blur-md text-white text-xs font-bold tracking-wider uppercase border border-red-500/30">
                 <Radio className="w-3.5 h-3.5 animate-pulse" />
-                <span>Live 24/7 on RukaTV+</span>
+                <span>{t('tv.liveBadge')}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
@@ -76,7 +78,7 @@ export const MlsSection: React.FC<MlsSectionProps> = ({
                   className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 active:scale-95 transition-all shadow-lg"
                 >
                   <Play className="w-4 h-4 fill-black text-black ml-0.5" />
-                  <span>Watch Channel</span>
+                  <span>{t('tv.watchChannel')}</span>
                 </button>
               </div>
             </div>
@@ -90,16 +92,16 @@ export const MlsSection: React.FC<MlsSectionProps> = ({
           <div>
             <h2 className="text-2xl font-bold text-white flex items-center gap-2.5">
               <Trophy className="w-5 h-5 text-yellow-500" />
-              <span>TV Season Live Channels</span>
+              <span>{t('tv.header')}</span>
             </h2>
             <p className="text-xs text-white/60 mt-0.5">
-              Stream 24/7 television channels directly from the Xtream server.
+              {t('tv.desc')}
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-white/60">
             <Calendar className="w-4 h-4" />
-            <span>{filteredItems.length} Available Channels</span>
+            <span>{filteredItems.length} {t('tv.available')}</span>
           </div>
         </div>
 
@@ -116,7 +118,7 @@ export const MlsSection: React.FC<MlsSectionProps> = ({
                     : 'glass-pill text-white/70 hover:text-white'
                 }`}
               >
-                {cat}
+                {cat === 'All' ? t('tv.all') : cat}
               </button>
             ))}
           </div>

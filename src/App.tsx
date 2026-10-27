@@ -5,6 +5,7 @@ import { fetchXtreamCatalog, fetchSeriesDetails, type XtreamCatalogData } from '
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { VideoPlayerModal } from './components/VideoPlayerModal';
+import { LanguageModal } from './components/LanguageModal';
 import { HomePage } from './pages/HomePage';
 import { TvSeasonPage } from './pages/TvSeasonPage';
 import { UpNextPage } from './pages/UpNextPage';
@@ -253,6 +254,9 @@ export const App: React.FC = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* Language & Region Selection Modal */}
+      <LanguageModal />
 
       {/* Embedded Video Player */}
       {playingState && (

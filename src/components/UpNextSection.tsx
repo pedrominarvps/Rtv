@@ -2,6 +2,7 @@ import React from 'react';
 import type { MediaItem } from '../types';
 import { MediaCard } from './MediaCard';
 import { ChannelCard } from './ChannelCard';
+import { useTranslation } from '../context/LanguageContext';
 import { Bookmark, Tv } from 'lucide-react';
 
 interface UpNextSectionProps {
@@ -23,15 +24,17 @@ export const UpNextSection: React.FC<UpNextSectionProps> = ({
   isInWatchlist,
   onExplore
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-12 select-none animate-fadeIn">
       {/* Header */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Up Next
+          {t('upnext.title')}
         </h1>
         <p className="text-sm text-white/60 mt-1">
-          Your personal queue and synced playback across all RukaTV devices.
+          {t('upnext.subtitle')}
         </p>
       </div>
 
@@ -39,7 +42,7 @@ export const UpNextSection: React.FC<UpNextSectionProps> = ({
       {continueWatchingItems.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-white/90">
-            Continue Watching
+            {t('upnext.continue')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {continueWatchingItems.map(item => (
@@ -60,7 +63,7 @@ export const UpNextSection: React.FC<UpNextSectionProps> = ({
       {/* Watchlist Section */}
       <section className="space-y-4">
         <h2 className="text-xl font-bold text-white/90">
-          Saved to Up Next ({watchlistItems.length})
+          {t('upnext.saved')} ({watchlistItems.length})
         </h2>
 
         {watchlistItems.length > 0 ? (
@@ -92,16 +95,16 @@ export const UpNextSection: React.FC<UpNextSectionProps> = ({
             <div className="p-4 rounded-full bg-white/10 text-white/70">
               <Bookmark className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-white">Your queue is empty</h3>
+            <h3 className="text-lg font-bold text-white">{t('upnext.emptyTitle')}</h3>
             <p className="text-sm text-white/60 max-w-sm">
-              Explore Ruka Originals, award-winning movies, and hit series. Add them to Up Next to easily continue watching later.
+              {t('upnext.emptyDesc')}
             </p>
             <button
               onClick={onExplore}
               className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 active:scale-95 transition-all shadow-md"
             >
               <Tv className="w-4 h-4" />
-              <span>Explore Originals</span>
+              <span>{t('upnext.explore')}</span>
             </button>
           </div>
         )}

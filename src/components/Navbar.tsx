@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { RukaTvLogo } from './RukaTvLogo';
-import { Search, Bookmark, Tv, Radio, User, Menu, X } from 'lucide-react';
+import { useTranslation } from '../context/LanguageContext';
+import { Search, Bookmark, Tv, Radio, User, Menu, X, Globe } from 'lucide-react';
 
 interface NavbarProps {
   watchlistCount: number;
@@ -11,6 +12,7 @@ export const Navbar: React.FC<NavbarProps> = ({ watchlistCount }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { t, currentOption, setIsLangModalOpen } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,9 +23,9 @@ export const Navbar: React.FC<NavbarProps> = ({ watchlistCount }) => {
   }, []);
 
   const navItems = [
-    { to: '/', label: 'RukaTV+', icon: Tv, end: true },
-    { to: '/tv-season', label: 'TV Season', icon: Radio },
-    { to: '/up-next', label: 'Up Next', icon: Bookmark, badge: watchlistCount },
+    { to: '/', label: t('nav.home'), icon: Tv, end: true },
+    { to: '/tv-season', label: t('nav.tvSeason'), icon: Radio },
+    { to: '/up-next', label: t('nav.upNext'), icon: Bookmark, badge: watchlistCount },
   ];
 
   return (
@@ -76,29 +78,40 @@ export const Navbar: React.FC<NavbarProps> = ({ watchlistCount }) => {
             </nav>
           </div>
 
-          {/* Right: Search & Profile */}
-          <div className="flex items-center gap-3">
+          {/* Right: Language, Search & Profile */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Quick Language Toggle Pill */}
+            <button
+              onClick={() => setIsLangModalOpen(true)}
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white transition-all cursor-pointer"
+              title={t('langModal.title')}
+              aria-label={t('langModal.title')}
+            >
+              <Globe className="w-3.5 h-3.5 text-purple-400" />
+              <span className="font-mono text-[11px] font-bold">{currentOption.badge}</span>
+            </button>
+
             {/* Search Trigger Route Link */}
             <Link
               to="/search"
-              className={`flex items-center gap-2.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                 location.pathname === '/search'
                   ? 'bg-white text-black border-white shadow-sm'
                   : 'bg-white/10 text-white/80 border-white/10 hover:bg-white/15 hover:text-white hover:border-white/25'
               }`}
-              aria-label="Search RukaTV+"
+              aria-label={t('nav.search')}
             >
               <Search className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Search...</span>
+              <span className="hidden sm:inline">{t('nav.search')}...</span>
             </Link>
 
             {/* Sign In / Account Pill */}
             <button
-              onClick={() => alert("Ruka Account Sign In")}
+              onClick={() => alert("Ruka Account")}
               className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-white/90 active:scale-95 transition-all shadow-sm"
             >
               <User className="w-3.5 h-3.5" />
-              <span>Sign In</span>
+              <span>{t('nav.signIn')}</span>
             </button>
 
             {/* Mobile Menu Button */}
@@ -144,15 +157,32 @@ export const Navbar: React.FC<NavbarProps> = ({ watchlistCount }) => {
                   </NavLink>
                 );
               })}
-              <div className="pt-3 border-t border-white/10">
+
+              <div className="pt-3 border-t border-white/10 space-y-2">
                 <Link
                   to="/search"
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:bg-white/10"
                 >
                   <Search className="w-4 h-4" />
-                  <span>Search Catalog</span>
+                  <span>{t('nav.search')}</span>
                 </Link>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsLangModalOpen(true);
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:bg-white/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-4 h-4 text-purple-400" />
+                    <span>{currentOption.label}</span>
+                  </div>
+                  <span className="px-2 py-0.5 bg-white/20 text-xs rounded-md font-mono font-bold">
+                    {currentOption.badge}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
