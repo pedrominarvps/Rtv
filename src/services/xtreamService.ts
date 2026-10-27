@@ -58,8 +58,8 @@ export async function fetchXtreamCatalog(): Promise<XtreamCatalogData> {
     const rawSeries: any[] = Array.isArray(seriesRes) ? seriesRes : [];
     const rawLive: any[] = Array.isArray(liveRes) ? liveRes : [];
 
-    // Map Movies
-    const movies: MediaItem[] = rawVod.slice(0, 150).map((v) => {
+    // Map Movies (Full catalog - 100% of VOD streams)
+    const movies: MediaItem[] = rawVod.map((v) => {
       const ratingNum = parseFloat(v.rating || '7.5');
       const score = Math.min(100, Math.round(ratingNum * 10));
       const year = v.release_date ? parseInt(v.release_date.slice(0, 4)) : 2025;
@@ -110,8 +110,8 @@ export async function fetchXtreamCatalog(): Promise<XtreamCatalogData> {
       };
     });
 
-    // Map Series
-    const seriesList: MediaItem[] = rawSeries.slice(0, 100).map((s) => {
+    // Map Series (Full catalog - 100% of Series)
+    const seriesList: MediaItem[] = rawSeries.map((s) => {
       const ratingNum = parseFloat(s.rating || '8.0');
       const score = Math.min(100, Math.round(ratingNum * 10));
       const year = s.release_date ? parseInt(s.release_date.slice(0, 4)) : 2025;

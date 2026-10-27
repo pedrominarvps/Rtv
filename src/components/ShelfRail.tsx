@@ -32,13 +32,23 @@ export const ShelfRail: React.FC<ShelfRailProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(40);
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
     setCanScrollLeft(scrollLeft > 10);
     setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+
+    // Progressively append more cards when scrolling near the end
+    if (scrollLeft + clientWidth >= scrollWidth - 600) {
+      setVisibleCount((prev) => Math.min(items.length, prev + 30));
+    }
   };
+
+  useEffect(() => {
+    setVisibleCount(Math.min(items.length, 40));
+  }, [items]);
 
   useEffect(() => {
     checkScroll();
@@ -51,10 +61,14 @@ export const ShelfRail: React.FC<ShelfRailProps> = ({
       if (current) current.removeEventListener('scroll', checkScroll);
       window.removeEventListener('resize', checkScroll);
     };
-  }, [items]);
+  }, [items, visibleCount]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
+    // When clicking right arrow, also pre-load more items if needed
+    if (direction === 'right' && visibleCount < items.length) {
+      setVisibleCount((prev) => Math.min(items.length, prev + 30));
+    }
     const scrollAmount = scrollRef.current.clientWidth * 0.75;
     scrollRef.current.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
@@ -63,6 +77,8 @@ export const ShelfRail: React.FC<ShelfRailProps> = ({
   };
 
   if (items.length === 0) return null;
+
+  const displayedItems = items.slice(0, visibleCount);
 
   return (
     <div className="relative py-4 select-none">
@@ -99,7 +115,7 @@ export const ShelfRail: React.FC<ShelfRailProps> = ({
           className="flex items-center gap-4 overflow-x-auto no-scrollbar px-4 sm:px-6 lg:px-8 pb-3 pt-1"
           style={{ scrollSnapType: 'x proximity' }}
         >
-          {items.map((item) => (
+          {displayedItems.map((item) => (
             isChannelRail || item.isLiveChannel ? (
               <ChannelCard
                 key={item.id}

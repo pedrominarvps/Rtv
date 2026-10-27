@@ -29,6 +29,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
   const queryParam = searchParams.get('q') || '';
   const [query, setQuery] = useState(queryParam);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [visibleCount, setVisibleCount] = useState(60);
 
   const categories = [
     { id: 'All', label: t('tv.all') },
@@ -90,6 +91,26 @@ export const SearchPage: React.FC<SearchPageProps> = ({
       return matchTitle || matchGenre || matchCast || matchSynopsis;
     });
   }, [catalog, query, selectedCategory]);
+
+  // Reset pagination when filter or search changes
+  useEffect(() => {
+    setVisibleCount(60);
+  }, [query, selectedCategory]);
+
+  // Infinite scroll listener for search grid
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 800) {
+        setVisibleCount((prev) => Math.min(filteredItems.length, prev + 60));
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [filteredItems.length]);
+
+  const displayedItems = useMemo(() => {
+    return filteredItems.slice(0, visibleCount);
+  }, [filteredItems, visibleCount]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 select-none animate-fadeIn space-y-8">
@@ -155,27 +176,40 @@ export const SearchPage: React.FC<SearchPageProps> = ({
           <span>{t('search.loading')}</span>
         </div>
       ) : filteredItems.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-          {filteredItems.map((item) =>
-            item.isLiveChannel ? (
-              <ChannelCard
-                key={item.id}
-                item={item}
-                onPlay={onPlay}
-                onToggleWatchlist={onToggleWatchlist}
-                isInWatchlist={isInWatchlist(item.id)}
-              />
-            ) : (
-              <MediaCard
-                key={item.id}
-                item={item}
-                aspect="poster"
-                onPlay={onPlay}
-                onOpenDetails={(target) => navigate(`/title/${target.id}`)}
-                onToggleWatchlist={onToggleWatchlist}
-                isInWatchlist={isInWatchlist(item.id)}
-              />
-            )
+        <div className="space-y-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+            {displayedItems.map((item) =>
+              item.isLiveChannel ? (
+                <ChannelCard
+                  key={item.id}
+                  item={item}
+                  onPlay={onPlay}
+                  onToggleWatchlist={onToggleWatchlist}
+                  isInWatchlist={isInWatchlist(item.id)}
+                />
+              ) : (
+                <MediaCard
+                  key={item.id}
+                  item={item}
+                  aspect="poster"
+                  onPlay={onPlay}
+                  onOpenDetails={(target) => navigate(`/title/${target.id}`)}
+                  onToggleWatchlist={onToggleWatchlist}
+                  isInWatchlist={isInWatchlist(item.id)}
+                />
+              )
+            )}
+          </div>
+
+          {visibleCount < filteredItems.length && (
+            <div className="pt-4 pb-6 text-center">
+              <button
+                onClick={() => setVisibleCount((prev) => Math.min(filteredItems.length, prev + 60))}
+                className="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium text-xs sm:text-sm transition-all border border-white/10 backdrop-blur-md"
+              >
+                Cargar más ({displayedItems.length} de {filteredItems.length})
+              </button>
+            </div>
           )}
         </div>
       ) : (
