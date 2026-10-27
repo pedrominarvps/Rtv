@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import type { MediaItem, Episode } from '../types';
 import { fetchSeriesDetails } from '../services/xtreamService';
 import { useTranslation } from '../context/LanguageContext';
@@ -86,15 +86,44 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ item, videoU
   const currentStreamUrl = streamCandidates[activeUrlIndex] || activeVideoUrl || item.streamVideoUrl;
   const isEmbedUrl = currentStreamUrl.includes('/embed-') || currentStreamUrl.includes('/e/');
 
-  const resetControlsTimer = () => {
+  const resetControlsTimer = useCallback(() => {
     setShowControls(true);
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
     controlsTimeoutRef.current = window.setTimeout(() => {
-      if (isPlaying) {
+      // Auto-hide controls after 3.5s for iframe embeds (Source 2/2) and playing videos
+      if (isEmbedUrl) {
+        setShowControls(false);
+      } else if (videoRef.current ? !videoRef.current.paused : isPlaying) {
         setShowControls(false);
       }
     }, 3500);
-  };
+  }, [isEmbedUrl, isPlaying]);
+
+  // Trigger auto-hide timer on initial modal open and whenever the active source changes
+  useEffect(() => {
+    resetControlsTimer();
+    return () => {
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    };
+  }, [resetControlsTimer, currentStreamUrl, activeUrlIndex]);
+
+  // Global mousemove, keydown, and fullscreen change listeners
+  useEffect(() => {
+    const handleGlobalMouseMove = () => {
+      resetControlsTimer();
+    };
+
+    const handleFullscreenChange = () => {
+      resetControlsTimer();
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, [resetControlsTimer]);
 
   // Try next fallback URL if available
   const tryNextSource = () => {
@@ -403,6 +432,7 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ item, videoU
     } else {
       document.exitFullscreen().catch(() => {});
     }
+    resetControlsTimer();
   };
 
   const formatTime = (secs: number) => {
@@ -419,10 +449,28 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ item, videoU
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 bg-black flex items-center justify-center overflow-hidden cursor-default select-none"
+      className={`fixed inset-0 z-50 bg-black flex items-center justify-center overflow-hidden select-none ${
+        showControls ? 'cursor-default' : 'cursor-none'
+      }`}
       onMouseMove={resetControlsTimer}
-      onClick={togglePlay}
+      onClick={!isEmbedUrl ? togglePlay : undefined}
     >
+      {/* Invisible edge hover sensors for iframe embeds to detect mouse movement near top/bottom */}
+      {isEmbedUrl && (
+        <>
+          <div
+            className="absolute top-0 inset-x-0 h-16 z-30 pointer-events-auto bg-transparent"
+            onMouseEnter={resetControlsTimer}
+            onMouseMove={resetControlsTimer}
+          />
+          <div
+            className="absolute bottom-0 inset-x-0 h-16 z-30 pointer-events-auto bg-transparent"
+            onMouseEnter={resetControlsTimer}
+            onMouseMove={resetControlsTimer}
+          />
+        </>
+      )}
+
       {/* If it's an embed iframe source */}
       {isEmbedUrl ? (
         <iframe
@@ -568,6 +616,7 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ item, videoU
         className={`absolute inset-0 flex flex-col justify-between p-6 bg-gradient-to-t from-black/85 via-transparent to-black/85 transition-opacity duration-300 pointer-events-none ${
           showControls ? 'opacity-100' : 'opacity-0'
         }`}
+        onMouseMove={resetControlsTimer}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Bar: Title & Exit */}
