@@ -112,7 +112,7 @@ export const ShelfRail: React.FC<ShelfRailProps> = ({
         {/* Scrollable Row */}
         <div
           ref={scrollRef}
-          className="flex items-center gap-4 overflow-x-auto no-scrollbar px-4 sm:px-6 lg:px-8 pb-3 pt-1"
+          className="flex items-start gap-3 sm:gap-4 overflow-x-auto no-scrollbar px-4 sm:px-6 lg:px-8 pb-3 pt-1"
           style={{ scrollSnapType: 'x proximity' }}
         >
           {displayedItems.map((item) => (

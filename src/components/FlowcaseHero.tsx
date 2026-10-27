@@ -51,7 +51,7 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
 
   return (
     <section 
-      className="relative w-full h-[76vh] min-h-[580px] max-h-[820px] overflow-hidden select-none"
+      className="relative w-full h-[76vh] min-h-[540px] sm:min-h-[580px] max-h-[820px] overflow-hidden select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       aria-label="Featured Showcase"
@@ -80,11 +80,11 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent" />
 
       {/* Content Container */}
-      <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-16 z-20">
-        <div className="max-w-2xl space-y-4">
+      <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-8 sm:pb-16 z-20">
+        <div className="max-w-2xl space-y-2.5 sm:space-y-4">
           {/* Ruka Original Label */}
           {activeItem.isAppleOriginal && (
-            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase text-white/90">
+            <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase text-white/90">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
               <span>{t('hero.original')}</span>
             </div>
@@ -99,20 +99,20 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
             }}
             className="hover:underline focus:outline-none block"
           >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-md">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-md line-clamp-2">
               {activeItem.title}
             </h1>
           </Link>
 
           {/* Tagline / Subtitle */}
           {activeItem.tagline && (
-            <p className="text-lg sm:text-xl font-medium text-white/90 drop-shadow">
+            <p className="text-base sm:text-xl font-medium text-white/90 drop-shadow line-clamp-1">
               {activeItem.tagline}
             </p>
           )}
 
           {/* Badges strip: Ratings, Rotten Tomatoes, 4K HDR */}
-          <div className="pt-1">
+          <div className="pt-0.5">
             <RatingBadges
               rating={activeItem.rating}
               rottenTomatoes={activeItem.rottenTomatoes}
@@ -121,25 +121,25 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
           </div>
 
           {/* Synopsis */}
-          <p className="text-sm sm:text-base text-white/80 line-clamp-3 leading-relaxed max-w-xl">
+          <p className="text-xs sm:text-base text-white/80 line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-xl">
             {activeItem.synopsis}
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 pt-3">
+          <div className="flex items-center gap-2.5 pt-1.5 sm:pt-3">
             {/* Primary: Stream Now */}
             <button
               onClick={() => onPlay(activeItem)}
-              className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 active:scale-95 transition-all shadow-lg shadow-white/10"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white text-black font-semibold text-xs sm:text-sm hover:bg-white/90 active:scale-95 transition-all shadow-lg shadow-white/10 whitespace-nowrap"
             >
-              <Play className="w-4 h-4 fill-black text-black" />
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black text-black" />
               <span>{t('hero.streamNow')}</span>
             </button>
 
             {/* Secondary: Add to Up Next */}
             <button
               onClick={() => onToggleWatchlist(activeItem)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold transition-all ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 inWatchlist 
                   ? 'bg-white/30 text-white border border-white/40' 
                   : 'glass-pill text-white'
@@ -147,12 +147,12 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
             >
               {inWatchlist ? (
                 <>
-                  <Check className="w-4 h-4 text-white" />
+                  <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   <span>{t('hero.inUpNext')}</span>
                 </>
               ) : (
                 <>
-                  <Plus className="w-4 h-4 text-white" />
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                   <span>{t('hero.addToUpNext')}</span>
                 </>
               )}
@@ -165,20 +165,20 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
                 e.stopPropagation();
                 onOpenDetails(activeItem);
               }}
-              className="p-3 rounded-full glass-pill text-white hover:text-white transition-all inline-flex items-center justify-center"
+              className="p-2.5 sm:p-3 rounded-full glass-pill text-white hover:text-white transition-all inline-flex items-center justify-center shrink-0"
               aria-label={t('hero.moreInfo')}
             >
-              <Info className="w-4 h-4" />
+              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
           </div>
         </div>
 
-        {/* Carousel Indicators and Navigation Arrows */}
-        <div className="absolute right-4 sm:right-8 bottom-16 flex items-center gap-3 z-30">
-          {/* Arrow Left */}
+        {/* Carousel Indicators and Navigation Arrows (Centered below buttons on mobile, bottom-right on desktop) */}
+        <div className="flex items-center justify-center sm:justify-end gap-3 pt-4 sm:pt-0 sm:absolute sm:right-8 sm:bottom-16 z-30">
+          {/* Arrow Left (Desktop only) */}
           <button
             onClick={handlePrev}
-            className="p-2 rounded-full glass-pill text-white/70 hover:text-white transition-all"
+            className="hidden sm:flex p-2 rounded-full glass-pill text-white/70 hover:text-white transition-all"
             aria-label="Previous Featured Item"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -191,17 +191,17 @@ export const FlowcaseHero: React.FC<FlowcaseHeroProps> = ({
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? 'w-7 bg-white' : 'w-2 bg-white/30 hover:bg-white/60'
+                  idx === currentIndex ? 'w-6 sm:w-7 bg-white' : 'w-2 bg-white/30 hover:bg-white/60'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
           </div>
 
-          {/* Arrow Right */}
+          {/* Arrow Right (Desktop only) */}
           <button
             onClick={handleNext}
-            className="p-2 rounded-full glass-pill text-white/70 hover:text-white transition-all"
+            className="hidden sm:flex p-2 rounded-full glass-pill text-white/70 hover:text-white transition-all"
             aria-label="Next Featured Item"
           >
             <ChevronRight className="w-4 h-4" />
