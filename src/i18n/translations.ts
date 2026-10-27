@@ -124,6 +124,16 @@ export const translations = {
     'error.title': 'No se pudo cargar el catálogo',
     'error.desc': 'Verifica la conexión con el servidor Xtream Code en .env o el estado de tu red.',
     'error.retry': 'Reintentar conexión',
+
+    // Player Controls
+    'player.skipIntro': 'Saltar Intro',
+    'player.nextEpisode': 'Siguiente episodio',
+    'player.prevEpisode': 'Episodio anterior',
+    'player.nextIn': 'Siguiente episodio en',
+    'player.playNow': 'Reproducir ahora',
+    'player.cancel': 'Cancelar',
+    'player.nowStreaming': 'Reproduciendo ahora · RukaTV+',
+    'player.liveBroadcast': 'Canal en vivo 24/7 · RukaTV+',
   },
 
   'es-ES': {
@@ -235,6 +245,16 @@ export const translations = {
     'error.title': 'No se pudo cargar el catálogo',
     'error.desc': 'Comprueba la conexión con el servidor Xtream Code en .env o el estado de tu red.',
     'error.retry': 'Reintentar conexión',
+
+    // Player Controls
+    'player.skipIntro': 'Saltar Intro',
+    'player.nextEpisode': 'Siguiente episodio',
+    'player.prevEpisode': 'Episodio anterior',
+    'player.nextIn': 'Siguiente episodio en',
+    'player.playNow': 'Reproducir ahora',
+    'player.cancel': 'Cancelar',
+    'player.nowStreaming': 'En reproducción · RukaTV+',
+    'player.liveBroadcast': 'Canal en directo 24/7 · RukaTV+',
   },
 
   en: {
@@ -346,6 +366,16 @@ export const translations = {
     'error.title': 'Could not load catalog',
     'error.desc': 'Check your Xtream Code connection in .env or your network connectivity.',
     'error.retry': 'Retry connection',
+
+    // Player Controls
+    'player.skipIntro': 'Skip Intro',
+    'player.nextEpisode': 'Next Episode',
+    'player.prevEpisode': 'Previous Episode',
+    'player.nextIn': 'Next episode in',
+    'player.playNow': 'Play Now',
+    'player.cancel': 'Cancel',
+    'player.nowStreaming': 'Now Streaming · RukaTV+',
+    'player.liveBroadcast': 'Live 24/7 Channel · RukaTV+',
   },
 
   pt: {
@@ -457,6 +487,16 @@ export const translations = {
     'error.title': 'Não foi possível carregar o catálogo',
     'error.desc': 'Verifique a conexão com o servidor Xtream Code em .env ou seu estado de rede.',
     'error.retry': 'Tentar novamente',
+
+    // Player Controls
+    'player.skipIntro': 'Pular Intro',
+    'player.nextEpisode': 'Próximo episódio',
+    'player.prevEpisode': 'Episódio anterior',
+    'player.nextIn': 'Próximo episódio em',
+    'player.playNow': 'Assistir agora',
+    'player.cancel': 'Cancelar',
+    'player.nowStreaming': 'Reproduzindo agora · RukaTV+',
+    'player.liveBroadcast': 'Canal ao vivo 24/7 · RukaTV+',
   },
 } as const;
 
